@@ -34,7 +34,6 @@ SMTP_PASSWORD=your_smtp_password
 SMTP_SERVER=your_smtp_server
 SMTP_PORT=your_smtp_port
 USER_LOCATION=your_location
-INTERESTED_TOPICS=topic1,topic2,topic3
 ```
 
 ## Usage
