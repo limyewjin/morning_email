@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 INTERESTED_TOPICS = [ "bitcoin", "ethereum" ]
+CRYPTO_PRICES = [ "bitcoin", "ethereum", "solana" ]
 
 def get_pacific_time():
     pacific_tz = pytz.timezone('US/Pacific')
@@ -57,20 +58,22 @@ def main():
     print(f"Formatted date: {formatted_date}")
 
     newspapers = ['WSJ', 'NY_NYT']
-    frontpage_png = None
+    frontpage_jpg = None
     for prefix in newspapers:
-      frontpage_png = frontpage.fetch_paper(prefix)
-      if frontpage_png:
-        print(f"Successfully fetched: {frontpage_png}")
+      frontpage_jpg = frontpage.fetch_paper(prefix)
+      if frontpage_jpg:
+        print(f"Successfully fetched: {frontpage_jpg}")
         break
       else:
-        print(f"Failed to fetch: {frontpage_png}")
+        print(f"Failed to fetch: {frontpage_jpg}")
 
     frontpage_data = None
-    if frontpage_png:
-      frontpage_data = frontpage.png_to_base64(frontpage_png)
+    if frontpage_jpg:
+      frontpage_data = frontpage.jpg_to_base64(frontpage_jpg)
 
-    weather_results = api.search_serper("weather", os.environ["USER_LOCATION"])
+    weather_results = api.search_serper("weather", location=os.environ["USER_LOCATION"])
+
+    crypto_results = api.fetch_crypto_data(CRYPTO_PRICES)
 
     interested_results = {}
     for query in INTERESTED_TOPICS:
@@ -98,18 +101,24 @@ The next ten days are: {next_ten_days}
 {interested_results}
 </user_interests>
 {frontpage_prompt}
-3. Compose a brief email summary following these guidelines:
+3. Current crypto prices for cryptocurrencies which the user is interested in the following format:
+<crypto_prices>
+{crypto_results}
+</crypto_prices>
+
+4. Compose a brief email summary following these guidelines:
    a. Start with a greeting appropriate for the time of day (morning/afternoon/evening).
    b. Provide a quick note about today's weather.
    c. Mention any interesting weather events in the next few days, if applicable.
-   d. Include relevant news only if there is new information (published within the last 24 hours) related to the top trending news or user interests. Provide links to news if mentioning.
-   e. If multiple news items are available, prioritize trending topics over user interests.
-   f. If no relevant news is available, omit the news section entirely.
-   g. Keep the email concise and informative.
-   h. Use a friendly, conversational tone.
-   i. End with a brief, friendly sign-off.
+   d. Include any significant crypto price movements (more than 5%), if applicable.
+   e. Include relevant news only if there is new information (published within the last 24 hours, ideally under 12 hours) related to the top trending news or user interests. Provide links to news if mentioning.
+   f. If multiple news items are available, prioritize trending topics over user interests.
+   g. If no relevant news is available, omit the news section entirely.
+   h. Keep the email concise and informative.
+   i. Use a friendly, conversational tone.
+   j. End with a brief, friendly sign-off.
 
-4. Format your response as follows:
+5. Format your response as follows:
    - Use <subject> tags for the email subject line.
    - Use <body> tags for the email body.
    - Ensure the entire email (subject and body) is no more than 5-7 sentences long.
@@ -122,7 +131,7 @@ The next ten days are: {next_ten_days}
      * <a href="URL">link text</a> for hyperlinks
    - Use line breaks (<br>) sparingly for better readability.
 
-5. If any required data is missing, note this briefly in the email body.
+6. If any required data is missing, note this briefly in the email body.
 
 Here's an example of how your output should be structured:
 
@@ -134,7 +143,7 @@ It's a beautiful sunny day today with a high of 75°F. Heads up for tomorrow - t
 Have a great day!
 </body>
 
-Remember, it's okay to omit news results if there's no new relevant information. Focus on providing a quick, useful summary for the user.
+Remember, it's okay to omit crypto price updates, updates to user interests, and news results if there's no new relevant information. Focus on providing a quick, useful summary for the user.
 """.strip()
 
     response = None
@@ -146,7 +155,7 @@ Remember, it's okay to omit news results if there's no new relevant information.
         'type': 'image',
         'source': {
           'type': 'base64',
-          'media_type': 'image/png',
+          'media_type': 'image/jpeg',
           'data': frontpage_data,
         }
       },

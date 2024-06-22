@@ -5,8 +5,9 @@ This project generates and sends a daily email containing a brief weather foreca
 ## Features
 
 - Retrieves current weather information based on the user's location
-- Fetches trending search queries and related news
+- Fetches frontpage of newspapers
 - Gathers news on user-specified topics of interest
+- Fetches crypto prices of specified cryptocurrencies
 - Uses Claude AI to generate a brief, personalized email summary
 - Sends the email summary to the specified recipient
 

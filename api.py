@@ -6,6 +6,7 @@ import re
 import json
 import os
 from retrying import retry
+from playwright.sync_api import sync_playwright
 
 from pytrends.request import TrendReq
 
@@ -107,3 +108,23 @@ def send_email(subject, body):
         server.starttls()
         server.login(sender_email, password)
         server.send_message(message)
+
+def fetch_crypto_data(crypto_ids):
+    base_url = "https://api.coingecko.com/api/v3/coins/markets"
+    params = {
+        "vs_currency": "usd",
+        "ids": ",".join(crypto_ids),
+        "order": "market_cap_desc",
+        "per_page": 100,
+        "page": 1,
+        "sparkline": False,
+        "price_change_percentage": "24h"
+    }
+
+    try:
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        return response.json()
+    except requests.RequestException as e:
+        print(f"An error occurred: {e}")
+        return None

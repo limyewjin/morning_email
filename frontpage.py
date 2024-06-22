@@ -9,11 +9,11 @@ def fetch_paper(prefix, offset=0):
     date = datetime.now() - timedelta(days=offset)
     path_to_pdf = f"https://cdn.freedomforum.org/dfp/pdf{date.day}/{prefix}.pdf"
     pdf_file = f"archive/{prefix}_{date.strftime('%Y%m%d')}.pdf"
-    png_file = f"archive/{prefix}_{date.strftime('%Y%m%d')}.png"
+    jpg_file = f"archive/{prefix}_{date.strftime('%Y%m%d')}.jpg"
     root_path = os.getcwd() + "/"
 
     # Check if PNG already exists
-    if not os.path.exists(png_file):
+    if not os.path.exists(jpg_file):
         # Try to download PDF
         response = requests.get(path_to_pdf)
         if response.status_code == 200:
@@ -34,18 +34,18 @@ def fetch_paper(prefix, offset=0):
                     new_height = 1568
                     new_width = int(width * (1568 / height))
                 img = img.resize((new_width, new_height))
-                img.save(png_file)
+                img.save(jpg_file, format="JPEG", quality=85)
             
-            return png_file
+            return jpg_file
     else:
-        return png_file
+        return jpg_file
 
     return False
 
 
-def png_to_base64(file_path):
+def jpg_to_base64(file_path):
     """
-    Load a PNG file and return its base64-encoded data.
+    Load a JPEG file and return its base64-encoded data.
     """
     if not os.path.exists(file_path):
         return None
